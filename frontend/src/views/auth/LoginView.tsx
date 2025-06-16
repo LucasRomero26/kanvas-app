@@ -16,8 +16,8 @@ export default function LoginView() {
 
     const { mutate } = useMutation({
         mutationFn: loginUser,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['user'] });
+        onSuccess: (data) => {
+            queryClient.setQueryData(['user'], data.user);
             toast.success("Inicio de sesión exitoso");
             navigate('/');
         },

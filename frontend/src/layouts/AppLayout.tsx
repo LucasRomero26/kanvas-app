@@ -19,6 +19,7 @@ export default function AppLayout() {
     const logoutMutation = useMutation({
         mutationFn: () => {
             localStorage.removeItem('AUTH_TOKEN');
+            localStorage.removeItem('USER');
             return Promise.resolve();
         },
         onSuccess: () => {
