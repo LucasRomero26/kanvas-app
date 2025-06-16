@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBoardById, updateTaskStatus, deleteTask } from '../api/BoardAPI';
 //
@@ -14,7 +14,7 @@ import type { Board, Task, TaskStatus } from '../types';
 import { Button } from '../components/ui/button';
 import AddTaskModal from '../components/tasks/AddTaskModal';
 import { toast } from 'sonner';
-import { PlusCircle } from 'lucide-react';
+import { PlusCircle, ArrowLeft } from 'lucide-react';
 
 const statusTranslations: Record<TaskStatus, string> = {
     pending: 'Pendiente',
@@ -50,14 +50,14 @@ export default function BoardView() {
     const mouseSensor = useSensor(MouseSensor, {
         // Require the mouse to move by 10 pixels before starting a drag
         activationConstraint: {
-          distance: 10,
+            distance: 10,
         },
     });
     const touchSensor = useSensor(TouchSensor, {
         // Press and hold for 250ms for touch devices
         activationConstraint: {
-          delay: 250,
-          tolerance: 5,
+            delay: 250,
+            tolerance: 5,
         },
     });
     const sensors = useSensors(mouseSensor, touchSensor);
@@ -73,7 +73,7 @@ export default function BoardView() {
         mutationFn: updateTaskStatus,
         onMutate: async (variables) => {
             await queryClient.cancelQueries({ queryKey: ['board', boardId] });
-            const previousBoardData = queryClient.getQueryData<Board & {tasks: Task[]}>(['board', boardId]);
+            const previousBoardData = queryClient.getQueryData<Board & { tasks: Task[] }>(['board', boardId]);
             if (previousBoardData) {
                 const updatedTasks = previousBoardData.tasks.map(task => {
                     if (task._id === variables.taskId) {
@@ -114,7 +114,7 @@ export default function BoardView() {
             setActiveTask(task);
         }
     };
-    
+
     const handleDragEnd = (event: DragEndEvent) => {
         const { over, active } = event;
         if (over) {
@@ -140,7 +140,7 @@ export default function BoardView() {
     const handleDragCancel = () => {
         setActiveTask(null);
     }
-    
+
     const handleDeleteTask = (taskId: Task['_id']) => {
         deleteTaskMutation.mutate({ boardId, taskId });
     };
@@ -152,15 +152,28 @@ export default function BoardView() {
     if (data) return (
         <>
             <div className="flex justify-between items-center mb-10">
-                <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white">{data.name}</h1>
+                {/* --- Botón de regreso + título --- */}
+                <div className="flex items-center gap-4">
+                    <Link to="/" aria-label="Regresar al administrador de tableros">
+                        <Button variant="ghost" className="flex items-center gap-2 text-sm font-medium">
+                            <ArrowLeft className="h-4 w-4" />
+                            <span></span>
+                        </Button>
+                    </Link>
+                    <h1 className="text-3xl md:text-5xl font-black text-slate-900 dark:text-white">
+                        {data.name}
+                    </h1>
+                </div>
+
+                {/* --- Botón “Añadir Tarea” existente --- */}
                 <Button onClick={() => setIsTaskModalOpen(true)}>
                     <PlusCircle className="mr-2" />
                     Añadir Tarea
                 </Button>
             </div>
-            
+
             {/* --- 3. PASS THE SENSORS TO THE DNDCONTEXT --- */}
-            <DndContext 
+            <DndContext
                 sensors={sensors}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
@@ -174,8 +187,8 @@ export default function BoardView() {
                             </h3>
                             <div className="bg-slate-100 dark:bg-gray-800/40 p-3 space-y-4 rounded-b-lg flex-grow min-h-[100px]">
                                 <SortableContext items={data.tasks.filter(t => t.status === statusKey).map(t => t._id)} strategy={verticalListSortingStrategy}>
-                                    <TaskList 
-                                        tasks={data.tasks.filter(task => task.status === statusKey)} 
+                                    <TaskList
+                                        tasks={data.tasks.filter(task => task.status === statusKey)}
                                         status={statusKey}
                                         onDelete={handleDeleteTask}
                                     />
@@ -186,7 +199,7 @@ export default function BoardView() {
                 </section>
 
                 <DragOverlay dropAnimation={dropAnimationConfig}>
-                    {activeTask ? <TaskCard task={activeTask} onDelete={() => {}} /> : null}
+                    {activeTask ? <TaskCard task={activeTask} onDelete={() => { }} /> : null}
                 </DragOverlay>
             </DndContext>
 
