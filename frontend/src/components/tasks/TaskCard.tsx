@@ -17,7 +17,7 @@ export default function TaskCard({ task, onDelete }: TaskCardProps) {
     const style = {
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: isDragging ? 0.3 : undefined,
+        opacity: isDragging ? 0.6 : 1,
     };
 
     return (

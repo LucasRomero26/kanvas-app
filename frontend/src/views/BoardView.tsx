@@ -4,8 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBoardById, updateTaskStatus, deleteTask } from '../api/BoardAPI';
 //
 // --- 1. IMPORT THE NECESSARY SENSORS AND HOOKS ---
-import { DndContext, DragOverlay, useSensor, useSensors, TouchSensor, MouseSensor } from '@dnd-kit/core';
-import type { DragStartEvent, DragEndEvent, DropAnimation } from '@dnd-kit/core';
+import { DndContext, DragOverlay, useSensor, useSensors, TouchSensor, MouseSensor, defaultDropAnimationSideEffects } from '@dnd-kit/core';import type { DragStartEvent, DragEndEvent, DropAnimation } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import TaskList from '../components/tasks/TaskList';
 import TaskCard from '../components/tasks/TaskCard';
@@ -34,7 +33,14 @@ const statusColors: Record<TaskStatus, string> = {
 
 const dropAnimationConfig: DropAnimation = {
     duration: 250,
-    easing: 'cubic-bezier(0.18, 0.67, 0.6, 1.22)',
+    easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+    sideEffects: defaultDropAnimationSideEffects({
+        styles: {
+            active: {
+                opacity: '0.6'
+            }
+        },
+    }),
 };
 
 export default function BoardView() {
