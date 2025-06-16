@@ -1,0 +1,24 @@
+# Ignorar dependencias de Node en ambos directorios
+**/node_modules/
+
+# Ignorar carpetas de compilación (build)
+**/dist/
+**/.tmp/
+
+# Archivos de caché de TypeScript
+**/*.tsbuildinfo
+
+# Archivos de entorno - ¡MUY IMPORTANTE!
+# Nunca subas tus claves secretas o contraseñas a GitHub.
+.env
+.env.*
+!.env.example
+
+# Archivos de registro (logs)
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Archivos generados por el sistema operativo
+.DS_Store
+Thumbs.db
