@@ -7,13 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-// Define RegisterFormData type locally if not exported from "../../types"
-type RegisterFormData = {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-};
+import type { RegisterFormData } from "../../types";
 
 export default function RegisterView() {
     const navigate = useNavigate();

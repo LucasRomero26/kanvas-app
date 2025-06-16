@@ -7,11 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-// Define LoginFormData type locally if not exported from '../../types'
-type LoginFormData = {
-    email: string;
-    password: string;
-};
+import type { LoginFormData } from "../../types";
 
 export default function LoginView() {
     const navigate = useNavigate();
