@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBoardById, updateTaskStatus, deleteTask } from '../api/BoardAPI';
-import { DndContext, DragOverlay } from '@dnd-kit/core';
+//
+// --- 1. IMPORT THE NECESSARY SENSORS AND HOOKS ---
+import { DndContext, DragOverlay, useSensor, useSensors, TouchSensor, MouseSensor } from '@dnd-kit/core';
 import type { DragStartEvent, DragEndEvent, DropAnimation } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import TaskList from '../components/tasks/TaskList';
@@ -12,7 +14,7 @@ import type { Board, Task, TaskStatus } from '../types';
 import { Button } from '../components/ui/button';
 import AddTaskModal from '../components/tasks/AddTaskModal';
 import { toast } from 'sonner';
-import { PlusCircle } from 'lucide-react'; // <- Importa el ícono
+import { PlusCircle } from 'lucide-react';
 
 const statusTranslations: Record<TaskStatus, string> = {
     pending: 'Pendiente',
@@ -22,7 +24,6 @@ const statusTranslations: Record<TaskStatus, string> = {
     completed: 'Completado'
 };
 
-// CAMBIO: Paleta de colores más moderna y compatible con ambos temas
 const statusColors: Record<TaskStatus, string> = {
     pending: 'border-t-slate-500 dark:border-t-slate-400',
     onHold: 'border-t-red-500 dark:border-t-red-400',
@@ -37,11 +38,29 @@ const dropAnimationConfig: DropAnimation = {
 };
 
 export default function BoardView() {
+    // ... (existing state and query hooks)
     const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
     const params = useParams();
     const boardId = params.boardId!;
     const queryClient = useQueryClient();
     const [activeTask, setActiveTask] = useState<Task | null>(null);
+
+
+    // --- 2. CONFIGURE THE SENSORS ---
+    const mouseSensor = useSensor(MouseSensor, {
+        // Require the mouse to move by 10 pixels before starting a drag
+        activationConstraint: {
+          distance: 10,
+        },
+    });
+    const touchSensor = useSensor(TouchSensor, {
+        // Press and hold for 250ms for touch devices
+        activationConstraint: {
+          delay: 250,
+          tolerance: 5,
+        },
+    });
+    const sensors = useSensors(mouseSensor, touchSensor);
 
     const { data, isLoading, isError } = useQuery({
         queryKey: ['board', boardId],
@@ -49,6 +68,7 @@ export default function BoardView() {
         retry: false
     });
 
+    // ... (existing mutation and handler functions)
     const updateTaskMutation = useMutation({
         mutationFn: updateTaskStatus,
         onMutate: async (variables) => {
@@ -125,6 +145,7 @@ export default function BoardView() {
         deleteTaskMutation.mutate({ boardId, taskId });
     };
 
+
     if (isLoading) return <p className="text-center">Cargando...</p>;
     if (isError) return <p className="text-center">Error al cargar el tablero</p>;
 
@@ -138,20 +159,19 @@ export default function BoardView() {
                 </Button>
             </div>
             
+            {/* --- 3. PASS THE SENSORS TO THE DNDCONTEXT --- */}
             <DndContext 
+                sensors={sensors}
                 onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 onDragCancel={handleDragCancel}
             >
-                {/* CAMBIO: Usamos 'items-start' para alinear las columnas */}
                 <section className="flex flex-col lg:flex-row gap-6 items-start">
                     {Object.entries(statusTranslations).map(([statusKey, statusValue]) => (
                         <div key={statusKey} className="w-full lg:w-1/5">
-                             {/* CAMBIO: Estilos mejorados para la cabecera de la columna */}
                             <h3 className={`text-lg font-semibold text-slate-700 dark:text-slate-200 bg-slate-200 dark:bg-gray-800 p-3 border-t-8 rounded-t-lg capitalize ${statusColors[statusKey as TaskStatus]}`}>
                                 {statusValue}
                             </h3>
-                            {/* CAMBIO: Contenedor de tareas con fondo y relleno */}
                             <div className="bg-slate-100 dark:bg-gray-800/40 p-3 space-y-4 rounded-b-lg flex-grow min-h-[100px]">
                                 <SortableContext items={data.tasks.filter(t => t.status === statusKey).map(t => t._id)} strategy={verticalListSortingStrategy}>
                                     <TaskList 
