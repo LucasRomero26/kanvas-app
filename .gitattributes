@@ -1,0 +1,6 @@
+# Trata todos los archivos como 'auto' para que Git decida.
+# Normalizará todos los archivos de texto a LF en el repositorio.
+* text=auto eol=lf
+
+# Si tienes scripts de shell (bash), es buena idea forzar LF
+*.sh text eol=lf
